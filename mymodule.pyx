@@ -16,19 +16,13 @@ cdef class Node:
         if self.ctx is NULL:
             raise MemoryError()
 
-    cdef _set_one_children(self, node_ctx **clist, int i, Node node):
-        clist[i] = node.ctx
-
     def set_children(self, *children):
         children_c = <node_ctx **>calloc(len(children), sizeof(node_ctx *))
         if children_c is NULL:
             raise MemoryError()
 
         for i, item in enumerate(children):
-            # FIXME: the following doesn't build:
-            #children_c[i] = item.ctx
-
-            self._set_one_children(children_c, i, item)
+            children_c[i] = (<Node>item).ctx
 
         node_set_children(self.ctx, len(children), children_c)
         free(children_c)
